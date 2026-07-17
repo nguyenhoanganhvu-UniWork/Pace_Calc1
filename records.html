@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pace Records</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="records.css">
+  <script src="https://kit.fontawesome.com/453effc9b0.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="app" data-unit="meter">
+
+  <header class="header records-header">
+    <a href="index.html" id="records-back-btn" aria-label="Go Back" style="text-decoration: none;">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h1>Pace Records</h1>
+  </header>
+
+  <div class="profile-card">
+    <img src="https://i.imgur.com/w99OaZ0.png" alt="Profile Picture" class="profile-img">
+    <div class="profile-info">
+      <h2>John Anderson</h2>
+      <p>Male • 15 yrs • CA • Rabbit Team</p>
+    </div>
+  </div>
+
+  <div class="unit-toggle">
+    <span class="unit-label-meter">Meters</span>
+    <button id="records-unit-switch" class="switch" data-unit="meter" aria-pressed="false">
+      <span class="switch-knob"></span>
+    </button>
+    <span class="unit-label-yard">Yards</span>
+  </div>
+
+  <div class="results-list" data-unit-list="meter">
+    <div class="result-row no-data" data-meters="60">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 60</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="100">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 100</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="200">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 200</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="400">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 400</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="800">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 800</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="1000">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 1.000</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+  </div>
+
+  <div class="results-list" data-unit-list="yard" style="display:none;">
+    <div class="result-row no-data" data-meters="60">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 60</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="100">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 100</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="200">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 200</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="400">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 400</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="800">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 800</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+    <div class="result-row no-data" data-meters="1000">
+      <span class="result-label"><span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>Avg 1.000</span>
+      <span class="result-right">
+        <span class="result-time" data-recorded="false">NT</span>
+        <i class="fa-solid fa-chevron-down" style="display:none;"></i>
+      </span>
+    </div>
+  </div>
+
+</div>
+
+<script src="records.js"></script>
+</body>
+</html>
