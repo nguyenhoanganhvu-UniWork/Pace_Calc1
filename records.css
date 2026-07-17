@@ -1,0 +1,70 @@
+.records-header {
+  justify-content: flex-start !important;
+  gap: 16px;
+}
+
+#records-back-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.profile-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.profile-info h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 2px;
+}
+
+.profile-info p {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.result-right i {
+  transition: transform 0.2s ease;
+}
+
+.result-row.has-data {
+  cursor: pointer;
+}
+
+.result-row.no-data {
+  cursor: default;
+}
+
+.records-dropdown {
+  background: #f7f7f7;
+  border-bottom: 1px solid #d9d9d9;
+  display: flex;
+  flex-direction: column;
+}
+
+.records-dropdown .record-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid #e6e6e6;
+}
