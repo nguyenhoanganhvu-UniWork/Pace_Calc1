@@ -315,15 +315,16 @@ body {
 .profile-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 5px;
+  padding: 5px;
   background: #ffffff;
   border-bottom: 1px solid #e0e0e0;
+  margin: 5px
 }
 
 .profile-img {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #ccc;
