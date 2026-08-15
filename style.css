@@ -181,7 +181,7 @@ body {
 
 .calc-icon {
   line-height: 1;
-  font-size: 30px;
+  font-size: 38px;   /* was 30px */
 }
 
 .results-list {
@@ -203,9 +203,8 @@ body {
   flex: 1;
   cursor: pointer;
 }
-
 .result-label {
-  font-size: 1.2rem;
+  font-size: 1.4rem;   /* was 1.2rem */
   font-weight: 700;
   color: #222;
   display: flex;
