@@ -352,13 +352,13 @@ body {
 .best-time-label {
   font-size: 1rem;
   font-weight: 700;
-  color: #d4a017;
+  color: #C5A059;
 }
 
 .best-time-value {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #d4a017;
+  color: #C5A059;
   text-decoration: underline;
   font-variant-numeric: tabular-nums;
 }
