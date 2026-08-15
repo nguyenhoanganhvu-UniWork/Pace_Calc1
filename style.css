@@ -341,7 +341,27 @@ body {
   color: #555;
 }
 
+.best-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid #e6e6e6;
+}
 
+.best-time-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #d4a017;
+}
+
+.best-time-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #d4a017;
+  text-decoration: underline;
+  font-variant-numeric: tabular-nums;
+}
 @media (min-width: 768px) {
   .app {
     max-width: 600px;
