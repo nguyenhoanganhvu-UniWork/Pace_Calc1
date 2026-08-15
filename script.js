@@ -1,8 +1,6 @@
 const stopwatchDisplay = document.getElementById('stopwatch-display');
 const unitSwitch = document.getElementById('unit-switch');
-const resetBtn = document.getElementById('reset-btn');
 const appEl = document.querySelector('.app');
-const saveBtn = document.getElementById('save-btn');
 
 const distanceButtons = document.querySelectorAll('.distance-btn');
 const resultsLists = document.querySelectorAll('.results-list');
@@ -85,7 +83,7 @@ function stopRun() {
   startTime = null;
 }
 //take(distace unit,time diff) then update the data of the coressponding result row 
-function recordResult(meters, elapsedMs) {
+async function recordResult(meters, elapsedMs) {
   const row = document.querySelector(
     `.results-list[data-unit-list="${currentUnit}"] .result-row[data-meters="${meters}"]`
   );
@@ -95,12 +93,32 @@ function recordResult(meters, elapsedMs) {
   timeEl.textContent = formatTime(elapsedMs);
   timeEl.dataset.recorded = 'true';
 
-  if (currentUnit === "meter") {
-    metertimestamp[meters] = Date.now();
-    metertimerecord[meters] = elapsedMs;
-  } else {
-    yardtimestamp[meters] = Date.now();
-    yardtimerecord[meters] = elapsedMs;
+  const doc = {
+    distance: meters,
+    logged_time: elapsedMs,
+    date_time: Date.now()
+  };
+
+  const payload = currentUnit === 'meter'
+    ? { meter: [doc], yard: [] }
+    : { meter: [], yard: [doc] };
+
+  try {
+    const res = await fetch('http://localhost:3000/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showNotification("Saved!");
+      fetchCounts(); // refresh badge counts so the new record shows up immediately
+    } else {
+      showNotification("Save Failed!");
+    }
+  } catch (err) {
+    console.error("Unable to send Data!", err);
+    showNotification("Save Failed!");
   }
 }
 
@@ -149,54 +167,8 @@ function handleUnitToggle() {
   updateDistanceLabels();
 }
 // stop timer if it's running, remove active attribute for current active button, change the stop watch to 00
-function handleReset() {
-  if (isRunning) {
-    stopTimerLoop();
-  }
-
-  distanceButtons.forEach(btn => btn.classList.remove('active'));
-  stopwatchDisplay.textContent = '00:00:00.00';
-
-  const activeList = document.querySelector(`.results-list[data-unit-list="${currentUnit}"]`);
-  activeList.querySelectorAll('.result-row').forEach(row => {
-    const timeEl = row.querySelector('.result-time');
-    const badge = row.querySelector('.record-badge');
-
-    if (timeEl) {
-      timeEl.textContent = 'NT';
-      timeEl.dataset.recorded = 'false';
-
-      if (badge && badge.style.display !== 'none') {
-        timeEl.style.display = 'none';
-      } else {
-        timeEl.style.display = 'inline';
-      }
-    }
-  });
-
-  isRunning = false;
-  activeMeters = null;
-  startTime = null;
-}
-
-let metertimerecord = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-let yardtimerecord = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-let metertimestamp = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-let yardtimestamp = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"}; 
 
 
-function buildRecordsToSave(timeRecordObj, timestampObj) {
-  let recordsToSave = [];
-  Object.keys(timeRecordObj).forEach(key => {
-    if (timeRecordObj[key] !== "NT") {
-      const loggedTime = timeRecordObj[key];
-      const dateTime = timestampObj[key];
-      let doc = { distance: key, logged_time: loggedTime, date_time: dateTime };
-      recordsToSave.push(doc);
-    }
-  });
-  return recordsToSave;
-}
 
 function showNotification(message) {
   notif.textContent = message;
@@ -207,9 +179,11 @@ function showNotification(message) {
   }, 5000);
 }
 
+// ---- counts / badges ----
+
 async function fetchCounts() {
   try {
-    const res = await fetch('/api/counts');
+    const res = await fetch('http://localhost:3000/api/counts');
     const counts = await res.json();
     updateBadges(counts);
   } catch (err) {
@@ -226,15 +200,21 @@ function updateBadges(counts) {
       const count = (counts[unit] && counts[unit][meters]) || 0;
       const badge = row.querySelector('.record-badge');
       const timeEl = row.querySelector('.result-time');
-
+      
       if (count > 0) {
+        // Show the database record count badge
         badge.textContent = count;
         badge.style.display = 'flex';
+        
+        // Hide "NT" if the stopwatch hasn't been run this session, but database records exist
         if (timeEl && timeEl.textContent === 'NT') {
           timeEl.style.display = 'none';
         }
       } else {
+        // No records in database
         badge.style.display = 'none';
+        
+        // Make sure "NT" is visible if there is indeed no time recorded
         if (timeEl && timeEl.textContent === 'NT') {
           timeEl.style.display = 'inline';
         }
@@ -242,6 +222,8 @@ function updateBadges(counts) {
     });
   });
 }
+
+// ---- records view ----
 
 function formatRecordDate(ts) {
   const date = new Date(ts);
@@ -260,17 +242,20 @@ function formatRecordDate(ts) {
   return `${dateStr}, ${timeStr}`;
 }
 
+// Inline dropdown for records under a result row
 async function toggleRecordsDropdown(row) {
   const meters = row.dataset.meters;
   const badge = row.querySelector('.record-badge');
-  if (!badge || badge.style.display === 'none') return;
+  if (!badge || badge.style.display === 'none') return; // no records to show
 
+  // if dropdown already exists, remove it
   const existing = row.nextElementSibling;
   if (existing && existing.classList && existing.classList.contains('records-dropdown')) {
     existing.remove();
     return;
   }
 
+  // close any other open dropdowns
   closeAllDropdowns();
 
   const dropdown = document.createElement('div');
@@ -279,7 +264,7 @@ async function toggleRecordsDropdown(row) {
   row.parentNode.insertBefore(dropdown, row.nextSibling);
 
   try {
-    const res = await fetch(`/api/records?unit=${currentUnit}&distance=${meters}`);
+    const res = await fetch(`http://localhost:3000/api/records?unit=${currentUnit}&distance=${meters}`);
     const records = await res.json();
 
     if (!records.length) {
@@ -287,15 +272,28 @@ async function toggleRecordsDropdown(row) {
       return;
     }
 
-    dropdown.innerHTML = records.map(r => `
+    const bestMs = Math.min(...records.map(r => r.logged_time));
+
+    const bestTimeHtml = ` 
+    <div class="best-time-row">
+      <span class="best-time-label">Best Time:</span>
+      <span class="best-time-value">${formatTime(bestMs)}</span>
+    </div>
+    `;
+
+    const entriesHtml = records.map(r => `
       <div class="record-entry">
         <span class="record-date">${formatRecordDate(r.date_time)}</span>
         <span class="record-time">${formatTime(r.logged_time)}</span>
       </div>
     `).join('');
+
+    dropdown.innerHTML = bestTimeHtml + entriesHtml;
+  
+
   } catch (err) {
-    console.error('Unable to fetch records', err);
-    dropdown.innerHTML = '<div class="records-empty">Failed to load</div>';
+    console.error('Unable to fetch records:', err);
+    dropdown.innerHTML = '<div class="records-empty">Failed to load data.</div>';
   }
 }
 
@@ -303,48 +301,13 @@ function closeAllDropdowns() {
   document.querySelectorAll('.records-dropdown').forEach(d => d.remove());
 }
 
-async function handleSave(){
-  const meterRecords = buildRecordsToSave(metertimerecord,metertimestamp); 
-  const yardRecords = buildRecordsToSave(yardtimerecord,yardtimestamp); 
-  let data = {meter: meterRecords, yard: yardRecords}; 
-  try {
-    const res = await fetch('/api/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-      console.log("Data Sent!");
-      showNotification("Saved!");
-
-      metertimerecord = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-      yardtimerecord = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-      metertimestamp = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-      yardtimestamp = {60: "NT", 100: "NT", 200: "NT", 400: "NT", 800: "NT", 1000: "NT"};
-
-      document.querySelectorAll('.result-time').forEach(el => {
-        el.textContent = 'NT';
-        el.dataset.recorded = 'false';
-      });
-
-      fetchCounts();
-    }
-  } catch (err) {
-    console.error("Unable to send Data!", err);
-    showNotification("Save Failed!");
-  }
-}
 
 
 //add event listener to each buttons
 distanceButtons.forEach(button => {
   button.addEventListener('click', () => handleDistanceClick(button));
 });
-//event listener for unit switch and reset btn
 unitSwitch.addEventListener('click', handleUnitToggle);
-resetBtn.addEventListener('click', handleReset);
-saveBtn.addEventListener('click', handleSave);
 
 document.querySelectorAll('.result-row').forEach(row => {
   row.addEventListener('click', () => toggleRecordsDropdown(row));

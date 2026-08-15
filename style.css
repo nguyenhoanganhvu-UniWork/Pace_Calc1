@@ -22,7 +22,7 @@ body {
 .main-view {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  flex-grow: 1; /* Automatically stretches to fill remaining height */
 }
 
 :root {
@@ -185,12 +185,12 @@ body {
 }
 
 .results-list {
-  display: flex;
+  display: flex; 
   flex-direction: column;
-  flex-grow: 1;
-  background-color: #ededed;
+  flex-grow: 1; /* This is the magic line! It stretches the gray list to the screen edge */
+  background-color: #ededed; /* Make sure this matches your current list row background color */
   margin-bottom: 0;
-  padding-bottom: 16px;
+  padding-bottom: 16px; /* Optional: gives a nice buffer space at the very bottom */
 }
 
 .result-row {
@@ -292,6 +292,7 @@ body {
   text-align: center;
 }
 
+/* Inline dropdown that appears under a result row */
 .records-dropdown {
   background: #f7f7f7;
   border-bottom: 1px solid #d9d9d9;
@@ -310,6 +311,7 @@ body {
   padding: 16px;
 }
 
+/* User Profile Card Styles */
 .profile-card {
   display: flex;
   align-items: center;

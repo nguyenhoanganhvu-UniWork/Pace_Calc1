@@ -1,10 +1,12 @@
 const unitSwitch = document.getElementById('records-unit-switch');
 const appEl = document.querySelector('.app');
+const meterListContainer = document.getElementById('records-meter-list');
+const yardListContainer = document.getElementById('records-yard-list');
 
 const distances = [60, 100, 200, 400, 800, 1000];
 let currentUnit = 'meter';
 
-//format how the stopwatch looks
+// format how the stopwatch looks
 function formatTime(ms) {
   const totalCentiseconds = Math.floor(ms / 10);
   const centiseconds = totalCentiseconds % 100;
@@ -17,6 +19,7 @@ function formatTime(ms) {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(centiseconds)}`;
 }
 
+// Format database date entries
 function formatRecordDate(ts) {
   const date = new Date(ts);
   const now = new Date();
@@ -34,71 +37,82 @@ function formatRecordDate(ts) {
   return `${dateStr}, ${timeStr}`;
 }
 
-// rows already exist in the HTML — this just fills in badge/chevron state
-function updateList(unit, countData) {
-  const list = document.querySelector(`.results-list[data-unit-list="${unit}"]`);
-  if (!list) return;
-
-  list.querySelectorAll('.result-row').forEach(row => {
-    const meters = row.dataset.meters;
-    const count = countData ? (countData[meters] || 0) : 0;
-    const hasData = count > 0;
-
-    const timeEl = row.querySelector('.result-time');
-    const chevron = row.querySelector('.result-right i');
-
-    row.classList.toggle('has-data', hasData);
-    row.classList.toggle('no-data', !hasData);
-
-    if (hasData) {
-      timeEl.style.display = 'none';
-      chevron.style.display = 'inline-block';
-    } else {
-      timeEl.style.display = 'inline';
-      chevron.style.display = 'none';
-    }
-  });
+// format labels to show "1.000" instead of "1000"
+function formatDistanceNumber(num) {
+  return num >= 1000 ? num.toLocaleString('de-DE') : String(num);
 }
 
+// Initialize and fetch counts on page load
 async function initDashboard() {
   try {
-    const res = await fetch('/api/counts');
+    const res = await fetch('http://localhost:3000/api/counts');
     const counts = await res.json();
-
-    updateList('meter', counts.meter);
-    updateList('yard', counts.yard);
+    
+    buildList(meterListContainer, 'meter', counts.meter);
+    buildList(yardListContainer, 'yard', counts.yard);
   } catch (err) {
     console.error("Could not load database counts:", err);
   }
 }
 
-async function toggleRecordsDropdown(row) {
-  if (!row.classList.contains('has-data')) return;
+// Build the row displays. If it has database logs, show the arrow. If empty, show NT.
+function buildList(container, unit, countData) {
+  container.innerHTML = '';
+  
+  distances.forEach(dist => {
+    const recordsCount = countData ? (countData[dist] || 0) : 0;
+    const hasData = recordsCount > 0;
+    
+    const row = document.createElement('div');
+    row.className = `result-row ${hasData ? 'has-data' : 'no-data'}`;
+    row.dataset.meters = dist;
+    
+    row.innerHTML = `
+      <span class="result-label">
+        <span class="calc-icon"><i class="fa-solid fa-calculator"></i></span>
+        Avg ${formatDistanceNumber(dist)}
+      </span>
+      <span class="result-right">
+        ${hasData 
+          ? `<i class="fa-solid fa-chevron-down" style="font-size: 1.4rem; color: #888;"></i>` 
+          : `<span class="result-time" data-recorded="false" style="color: #9a9a9a; font-size: 1.6rem; font-weight: 800;">NT</span>`
+        }
+      </span>
+    `;
+    
+    container.appendChild(row);
 
+    if (hasData) {
+      row.addEventListener('click', () => toggleRecordsDropdown(row, unit));
+    }
+  });
+}
+
+// Handles toggle details click
+async function toggleRecordsDropdown(row, unit) {
   const meters = row.dataset.meters;
-  const unit = row.closest('.results-list').dataset.unitList;
-  const chevron = row.querySelector('.result-right i');
-
+  const icon = row.querySelector('.result-right i');
+  
   const existingDropdown = row.nextElementSibling;
   if (existingDropdown && existingDropdown.classList.contains('records-dropdown')) {
     existingDropdown.remove();
     row.classList.remove('expanded');
-    if (chevron) chevron.style.transform = 'rotate(0deg)';
+    if (icon) icon.style.transform = 'rotate(0deg)';
     return;
   }
-
+  
   closeAllDropdowns();
-
+  
   row.classList.add('expanded');
-  if (chevron) chevron.style.transform = 'rotate(180deg)';
-
+  if (icon) icon.style.transform = 'rotate(180deg)';
+  
   const dropdown = document.createElement('div');
   dropdown.className = 'records-dropdown';
   dropdown.innerHTML = '<div class="records-loading">Loading...</div>';
   row.parentNode.insertBefore(dropdown, row.nextSibling);
 
   try {
-    const res = await fetch(`/api/records?unit=${unit}&distance=${meters}`);
+    const res = await fetch(`http://localhost:3000/api/records?unit=${unit}&distance=${meters}`);
     const records = await res.json();
 
     if (!records.length) {
@@ -122,29 +136,24 @@ function closeAllDropdowns() {
   document.querySelectorAll('.records-dropdown').forEach(d => d.remove());
   document.querySelectorAll('.result-row').forEach(row => {
     row.classList.remove('expanded');
-    const chevron = row.querySelector('.result-right i');
-    if (chevron) chevron.style.transform = 'rotate(0deg)';
+    const icon = row.querySelector('.result-right i');
+    if (icon) icon.style.transform = 'rotate(0deg)';
   });
 }
 
+// Toggles unit list displays
 function handleUnitToggle() {
   closeAllDropdowns();
   currentUnit = currentUnit === 'meter' ? 'yard' : 'meter';
-
+  
   unitSwitch.dataset.unit = currentUnit;
   unitSwitch.setAttribute('aria-pressed', currentUnit === 'yard');
   appEl.dataset.unit = currentUnit;
 
-  document.querySelectorAll('.results-list').forEach(list => {
-    list.style.display = (list.dataset.unitList === currentUnit) ? 'flex' : 'none';
-  });
+  meterListContainer.style.display = (currentUnit === 'meter') ? 'flex' : 'none';
+  yardListContainer.style.display = (currentUnit === 'yard') ? 'flex' : 'none';
 }
 
 unitSwitch.addEventListener('click', handleUnitToggle);
-
-// click listeners attached once, upfront — toggleRecordsDropdown checks has-data at click time
-document.querySelectorAll('.result-row').forEach(row => {
-  row.addEventListener('click', () => toggleRecordsDropdown(row));
-});
 
 initDashboard();

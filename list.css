@@ -1,0 +1,98 @@
+
+.header {
+  background: #2e2e2e;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0;
+  height:fit-content;
+
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.athlete-list{
+   display: flex;
+   flex-direction: column;
+    gap: 8px;
+}
+
+.athlete-card{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 16px;
+    margin-top: 4px;
+}
+.athlete-card1{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 16px;
+    background: #f2eeee;
+    margin-top: 4px;
+}
+
+.profile-pic{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    align-self: flex-start;
+}
+
+.athlete-info{
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 0;
+    align-items: left;
+    align-self: flex-start;
+    height: 100%;
+    flex: 1;
+}
+
+.athlete-info h2{
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #111;
+    margin: 10px 0 0 0 ;
+}
+
+.athlete-info p{
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+}
+
+.athlete-calc-btn {
+  background: #eeeeee;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;   /* removes the underline links get by default */
+  cursor: pointer;
+}
+
+.athlete-calc-btn i {
+  font-size: 3.5rem;
+  color: #333;
+}
+
+body{
+    margin: 0;
+}
+
+.page-container{
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
