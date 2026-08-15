@@ -104,7 +104,7 @@ async function recordResult(meters, elapsedMs) {
     : { meter: [], yard: [doc] };
 
   try {
-    const res = await fetch('http://localhost:3000/api/save', {
+    const res = await fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -183,7 +183,7 @@ function showNotification(message) {
 
 async function fetchCounts() {
   try {
-    const res = await fetch('http://localhost:3000/api/counts');
+    const res = await fetch('/api/counts');
     const counts = await res.json();
     updateBadges(counts);
   } catch (err) {
@@ -264,7 +264,7 @@ async function toggleRecordsDropdown(row) {
   row.parentNode.insertBefore(dropdown, row.nextSibling);
 
   try {
-    const res = await fetch(`http://localhost:3000/api/records?unit=${currentUnit}&distance=${meters}`);
+    const res = await fetch(`/api/records?unit=${currentUnit}&distance=${meters}`);
     const records = await res.json();
 
     if (!records.length) {
